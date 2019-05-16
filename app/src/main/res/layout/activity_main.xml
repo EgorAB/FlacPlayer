@@ -2,6 +2,7 @@
 <android.support.v4.widget.DrawerLayout
         xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:id="@+id/drawer_layout"
         android:layout_height="match_parent"
+        android:background="@color/white"
                                         xmlns:android="http://schemas.android.com/apk/res/android"
                                         android:layout_width="match_parent">
     <android.support.v7.widget.Toolbar
@@ -13,7 +14,13 @@
     <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/white"
             tools:context=".MainActivity" android:layout_marginTop="?attr/actionBarSize">
+        <include layout="@layout/play_scene"
+                 android:layout_width="match_parent"
+                 android:layout_height="match_parent"
+                 tools:layout_editor_absoluteX="125dp"
+                 android:layout_marginBottom="?attr/actionBarSize"/>
         <android.support.design.widget.BottomNavigationView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -23,12 +30,11 @@
                 app:itemIconTint="@color/bottom_navigation_item_background_colors"
                 app:itemTextColor="@color/bottom_navigation_item_background_colors"
                 app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <include layout="@layout/play_scene" android:layout_width="match_parent" android:layout_height="match_parent"
-                 tools:layout_editor_absoluteX="125dp"/>
     </android.support.constraint.ConstraintLayout>
 
     <android.support.design.widget.NavigationView
+            app:headerLayout="@layout/nav_header_main"
+            app:menu="@menu/activity_main_drawer"
             android:fitsSystemWindows="true"
             android:layout_width="wrap_content"
             android:layout_gravity="start"

@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Flac Player</string>
-    <string name="menu_icon_play_button">Player</string>
-    <string name="menu_icon_library_button">My Library</string>
-    <string name="menu_icon_playlist_button">Playlist</string>
+    <string name="menu_icon_play_button">Аудио</string>
+    <string name="menu_icon_library_button">Библиотека</string>
+    <string name="menu_icon_playlist_button">Плейлист</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
