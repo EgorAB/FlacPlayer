@@ -16,11 +16,24 @@
             android:layout_height="match_parent"
             android:background="@color/white"
             tools:context=".MainActivity" android:layout_marginTop="?attr/actionBarSize">
+
         <include layout="@layout/play_scene"
+                 android:visibility="visible"
                  android:layout_width="match_parent"
                  android:layout_height="match_parent"
                  tools:layout_editor_absoluteX="125dp"
                  android:layout_marginBottom="?attr/actionBarSize"/>
+        <include layout="@layout/playlist_scene"
+                 android:visibility="gone"
+                 android:layout_marginBottom="?attr/actionBarSize"
+                 android:layout_height="match_parent"
+                 android:layout_width="match_parent"/>
+        <include layout="@layout/library_scene"
+                 android:visibility="visible"
+                 android:layout_marginBottom="?attr/actionBarSize"
+                 android:layout_height="match_parent"
+                 android:layout_width="match_parent"/>
+
         <android.support.design.widget.BottomNavigationView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
