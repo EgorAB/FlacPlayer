@@ -23,5 +23,8 @@
                 app:layout_constraintHorizontal_bias="0.469" app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="100dp" android:layout_marginBottom="80dp"
                 android:src="@drawable/ic_telegram"/>
+        <ViewFlipper android:layout_width="match_parent" android:layout_height="match_parent">
+
+        </ViewFlipper>
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
