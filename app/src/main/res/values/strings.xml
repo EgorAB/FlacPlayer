@@ -5,4 +5,5 @@
     <string name="menu_icon_playlist_button">Плейлист</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="menu_icon_orher_button">Ещё</string>
 </resources>

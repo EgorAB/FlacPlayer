@@ -14,4 +14,8 @@
           app:showAsAction="ifRoom"
           android:color = "@color/colorAccent"
           android:icon="@drawable/ic_playlist_play_black_24dp"/>
+    <item android:id="@+id/moreButton" android:title="@string/menu_icon_orher_button"
+          app:showAsAction="ifRoom"
+          android:color = "@color/colorAccent"
+          android:icon="@drawable/ic_more_horiz_black_24dp"/>
 </menu>

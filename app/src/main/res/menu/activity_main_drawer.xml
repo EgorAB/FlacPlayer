@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
-        <item   android:id="@+id/nav_account"
-                android:title="Аккаунт"
-                android:icon="@drawable/ic_account_box_black_24dp"/>
-        <item   android:id="@+id/nav_settings"
-                android:title="Настройки"
-                android:icon="@drawable/ic_settings_black_24dp"/>
-        <item   android:id="@+id/nav_about"
-                android:title="О приложении"
-                android:icon="@drawable/ic_info_black_24dp"/>
+        <item android:id="@+id/nav_account"
+              android:title="Аккаунт"
+              android:icon="@drawable/ic_account_box_black_24dp"/>
+        <item android:id="@+id/nav_settings"
+              android:title="Настройки"
+              android:icon="@drawable/ic_settings_black_24dp"/>
+        <item android:id="@+id/nav_about"
+              android:title="О приложении"
+              android:icon="@drawable/ic_info_black_24dp"/>
+    </group>
+    <group>
+        <item android:id="@+id/nav_telegram_import"
+              android:title="Импортировать из Telegram"
+              android:icon="@drawable/ic_telegram">
+        </item>
     </group>
 </menu>

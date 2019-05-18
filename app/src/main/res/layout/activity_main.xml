@@ -5,17 +5,11 @@
         android:background="@color/white"
                                         xmlns:android="http://schemas.android.com/apk/res/android"
                                         android:layout_width="match_parent">
-    <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
-            app:layout_constraintTop_toTopOf="parent"/>
     <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
-            tools:context=".MainActivity" android:layout_marginTop="?attr/actionBarSize">
+            tools:context=".MainActivity">
 
         <include layout="@layout/play_scene"
                  android:visibility="visible"
@@ -29,12 +23,18 @@
                  android:layout_height="match_parent"
                  android:layout_width="match_parent"/>
         <include layout="@layout/library_scene"
-                 android:visibility="visible"
+                 android:visibility="gone"
+                 android:layout_marginBottom="?attr/actionBarSize"
+                 android:layout_height="match_parent"
+                 android:layout_width="match_parent"/>
+        <include layout="@layout/options_scene"
+                 android:visibility="gone"
                  android:layout_marginBottom="?attr/actionBarSize"
                  android:layout_height="match_parent"
                  android:layout_width="match_parent"/>
 
         <android.support.design.widget.BottomNavigationView
+                app:labelVisibilityMode="labeled"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemBackground="@color/colorPrimary"
