@@ -2,20 +2,17 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/libraryButton" android:title="@string/menu_icon_library_button"
+    <item android:id="@+id/homeButton" android:title="@string/menu_icon_home_button"
           app:showAsAction="ifRoom"
-          android:color = "@color/colorAccent"
-          android:icon="@drawable/ic_library_music_black_24dp"/>
+          android:color = "@color/materialDarkGray"
+          android:icon="@drawable/ic_home_black_24dp"/>
     <item android:id="@+id/playButton" android:title="@string/menu_icon_play_button"
           app:showAsAction="ifRoom"
-          android:color = "@color/colorAccent"
+          android:color = "@color/materialDarkGray"
           android:icon="@drawable/ic_play_circle_filled_black_24dp"/>
-    <item android:id="@+id/playlistButton" android:title="@string/menu_icon_playlist_button"
-          app:showAsAction="ifRoom"
-          android:color = "@color/colorAccent"
-          android:icon="@drawable/ic_playlist_play_black_24dp"/>
+
     <item android:id="@+id/moreButton" android:title="@string/menu_icon_orher_button"
           app:showAsAction="ifRoom"
-          android:color = "@color/colorAccent"
+          android:color = "@color/materialDarkGray"
           android:icon="@drawable/ic_more_horiz_black_24dp"/>
 </menu>

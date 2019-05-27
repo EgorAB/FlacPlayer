@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
                                              android:id="@+id/library_scene"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent">
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Library Scene"/>
-    <ListView android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView
+            android:text="Библиотека"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/textView7"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="?attr/actionBarSize" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="48sp"
+            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="400dp"
+            app:layout_constraintHorizontal_bias="0.496" app:layout_constraintVertical_bias="0.009"/>
+    <ListView android:layout_width="match_parent" android:layout_height="match_parent"
+              app:layout_constraintTop_toBottomOf="@+id/textView7">
 
     </ListView>
 </android.support.constraint.ConstraintLayout>
