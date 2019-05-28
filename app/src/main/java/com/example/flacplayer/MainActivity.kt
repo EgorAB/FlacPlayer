@@ -8,6 +8,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.home_layout.*
 import kotlinx.android.synthetic.main.more_layout.*
 import kotlinx.android.synthetic.main.player_tabs.*
+import kotlinx.android.synthetic.main.player_tabs.view.*
 
 
 class MainActivity : FragmentActivity() {
@@ -51,5 +52,6 @@ class MainActivity : FragmentActivity() {
         adapter.addFragment(PlaySceneFragment(), "Трек")
         adapter.addFragment(PlaylistSceneFragment(), "Плейлист")
         viewPager.adapter = adapter
+        viewPager.currentItem = 1
     }
 }
