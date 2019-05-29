@@ -50,7 +50,7 @@ class PlaySceneFragment : Fragment() {
             blocks_scene.addView(view)
             ObjectAnimator.ofInt(play_scene, "scrollY", parent_of_blocks_scene.bottom).setDuration(900).start()
             view.findViewWithTag<ImageButton>("delete_button").setOnClickListener {
-                view.animate().setDuration(500).alpha(0F).withEndAction {
+                view.animate().setDuration(300).alpha(0F).withEndAction {
                     run { blocks_scene.removeView(view) }
                 }
             }

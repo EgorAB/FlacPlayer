@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v4.view.ViewPager
 import android.view.View
+import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.home_layout.*
 import kotlinx.android.synthetic.main.more_layout.*
@@ -15,6 +16,7 @@ class MainActivity : FragmentActivity() {
 
     private var selectedScene: View? = null
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         selectedScene = player_tabs
@@ -38,6 +40,9 @@ class MainActivity : FragmentActivity() {
         }
         setupViewPager(viewPager)
         tabLayout.setupWithViewPager(viewPager)
+        moreListView.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+            arrayOf("Настройки",
+                    "О приложении"))
     }
 
     private fun selectScene(newScene: View) {
