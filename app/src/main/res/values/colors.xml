@@ -2,13 +2,16 @@
 <resources>
     <color name="colorPrimary">#FF8A56</color>
     <color name="colorPrimaryDark">#BF360C</color>
+    <color name="colorPrimaryLight">#FFAB91</color>
     <color name="colorAccent">#FF6E40</color>
     <color name="darkThemeColorPrimary">#9575CD</color>
     <color name="darkThemeColorPrimaryDark">#7E57C2</color>
+    <color name="darkThemeColorPrimaryLight">#B39DDB</color>
     <color name="darkThemeColorAccent">#7E57C2</color>
     <color name="white">#FFFFFF</color>
     <color name="materialBlack">#121212</color>
     <color name="materialDarkGray">#212121</color>
     <color name="materialGray">#424242</color>
     <color name="materialLightGray">#616161</color>
+    <color name="telegramLogoColor">#0088CC</color>
 </resources>

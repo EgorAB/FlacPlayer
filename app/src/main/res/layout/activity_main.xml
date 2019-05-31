@@ -40,12 +40,12 @@
                 app:layout_constraintBottom_toBottomOf="parent"/>
     </android.support.constraint.ConstraintLayout>
 
-    <android.support.design.widget.NavigationView
-            app:headerLayout="@layout/nav_header_main"
-            app:menu="@menu/activity_main_drawer"
-            android:fitsSystemWindows="true"
-            android:layout_width="wrap_content"
-            android:layout_gravity="start"
-            android:layout_height="match_parent"
-            android:id="@+id/navigationView"/>
+    <!--<android.support.design.widget.NavigationView-->
+            <!--app:headerLayout="@layout/nav_header_main"-->
+            <!--app:menu="@menu/activity_main_drawer"-->
+            <!--android:fitsSystemWindows="true"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_gravity="start"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:id="@+id/navigationView"/>-->
 </android.support.v4.widget.DrawerLayout>
