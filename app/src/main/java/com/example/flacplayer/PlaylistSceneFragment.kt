@@ -9,10 +9,14 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 
 class PlaylistSceneFragment : Fragment() {
+
+    var songList: Array<Song> = arrayOf()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view =  inflater.inflate(R.layout.playlist_scene, container, false)
-        view.findViewById<ListView>(R.id.playlistListView).adapter =
-            ArrayAdapter<String>(view.context, android.R.layout.simple_list_item_1,
+        val view = inflater.inflate(R.layout.playlist_scene, container, false)
+        view.findViewById<ListView>(R.id.songListView).adapter =
+            ArrayAdapter<String>(
+                view.context, android.R.layout.simple_list_item_1,
                 arrayOf(
                     "Pixel Terror - Amnesia",
                     "Bandlez - Together Again",
@@ -74,7 +78,8 @@ class PlaylistSceneFragment : Fragment() {
                     "The Neighbourhood - Afraid (Album Version)",
                     "Au5 - Zero (Original Mix)",
                     "San Holo - Light"
-                ))
+                )
+            )
         return view
     }
 }
