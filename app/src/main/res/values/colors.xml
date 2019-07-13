@@ -13,5 +13,6 @@
     <color name="materialDarkGray">#212121</color>
     <color name="materialGray">#424242</color>
     <color name="materialLightGray">#616161</color>
+    <color name="materialExtraLightGray">#757575</color>
     <color name="telegramLogoColor">#0088CC</color>
 </resources>

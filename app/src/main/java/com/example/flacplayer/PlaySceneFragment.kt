@@ -44,7 +44,7 @@ class PlaySceneFragment : Fragment() {
     private var seekBar: SeekBar? = null
     private var songArtist: TextView? = null
     private var songTitle: TextView? = null
-    private var Gradient: ImageView? = null
+    private var gradient: ImageView? = null
 
     private var previousButton: ImageButton? = null
     private var nextButton: ImageButton? = null
@@ -161,7 +161,7 @@ class PlaySceneFragment : Fragment() {
     }
 
     private fun initializeValues(v: View) {
-        Gradient = v.findViewById(R.id.Gradient)
+        gradient = v.findViewById(R.id.Gradient)
         songTitle = v.findViewById(R.id.songTitle1)
         songArtist = v.findViewById(R.id.songArtist)
         playButton = v.findViewById(R.id.playButton)

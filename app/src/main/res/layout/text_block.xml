@@ -44,6 +44,7 @@
             <android.support.constraint.ConstraintLayout android:layout_width="wrap_content"
                                                          android:layout_height="match_parent"
                                                          app:layout_constraintEnd_toEndOf="parent">
+
                 <ImageButton android:layout_width="48dp"
                              android:layout_height="48dp"
                              android:visibility="visible"
@@ -63,7 +64,7 @@
                              app:layout_constraintTop_toTopOf="parent" android:src="@drawable/ic_check_black_24dp"
                 />
                 <ImageButton android:layout_width="48dp"
-                             android:tag="delete_button"
+                             android:tag="deьбlete_button"
                              android:layout_height="48dp"
                              android:backgroundTint="@color/white"
                              android:scaleType="fitCenter"
