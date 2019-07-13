@@ -68,7 +68,7 @@ class MainActivity : FragmentActivity(), PlaylistSceneFragment.OnFragmentInterac
     private fun setupViewPager(viewPager: ViewPager) {
         val adapter = ViewPagerAdapter(supportFragmentManager)
         adapter.addFragment(LibrarySceneFragment(), "Библиотека")
-//        adapter.addFragment(PlaySceneFragment(), "Трек")
+        adapter.addFragment(PlaySceneFragment(), "Трек")
         adapter.addFragment(PlaylistSceneFragment(), "Плейлист")
         viewPager.adapter = adapter
         viewPager.currentItem = 1

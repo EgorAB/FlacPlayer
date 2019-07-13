@@ -181,6 +181,8 @@ class PlaySceneFragment : Fragment() {
             mediaPlayer!!.reset()
         }
         mediaPlayer = MediaPlayer.create(context, songId.toInt())
+
+
         seekBar!!.progress = 0
         mediaPlayer!!.seekTo(0)
         seekBar!!.max = mediaPlayer?.duration!!
