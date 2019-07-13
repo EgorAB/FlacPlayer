@@ -13,55 +13,57 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.SeekBar
+import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.TextView
 import kotlinx.android.synthetic.main.blocks_scene.*
 import kotlinx.android.synthetic.main.play_scene.*
 
 
 class PlaySceneFragment : Fragment() {
 
-    var songList: Array<Song> = arrayOf()
+    var songList: ArrayList<Song> = arrayListOf()
 
     private var currentSongListIndex: Int = 0
         set(value) {
-            if (value > 0) field = if (value >= songList.size) 0 else value
-            else field = songList.size - 1
+            field = if (value >= 0) if (value >= songList.size) 0 else value else songList.size - 1
+        }
+    private var isRepeating: Boolean = false
+        set(value) {
+            field = value
+            repeatButton?.setColorFilter(resources.getColor(if (value) R.color.materialBlack else R.color.materialExtraLightGray))
+            mediaPlayer?.isLooping = value
         }
 
-    private var playerActive = false
-
+    private var clickedOnSeekBar = false
     private var handler = Handler()
 
     private var mediaPlayer: MediaPlayer? = null
     private var timeCurrent: TextView? = null
     private var timeLeft: TextView? = null
     private var playButton: ImageButton? = null
-
+    private var seekBar: SeekBar? = null
     private var songArtist: TextView? = null
     private var songTitle: TextView? = null
+    private var Gradient: ImageView? = null
 
     private var previousButton: ImageButton? = null
     private var nextButton: ImageButton? = null
+    private var repeatButton: ImageButton? = null
+    private var shuffleButton: ImageButton? = null
 
     private fun play() {
-        playerActive = true
         try {
             mediaPlayer!!.start()
-            startPlayProgressUpdater(seekBar)
+            startPlayProgressUpdater()
+            playButton!!.setImageResource(R.drawable.ic_pause_black_24dp)
         } catch (e: IllegalStateException) {
             mediaPlayer!!.pause()
         }
-        playButton!!.setImageResource(R.drawable.ic_pause_black_24dp)
     }
 
     private fun pause() {
-        playerActive = false
-        mediaPlayer!!.pause()
-        playButton!!.setImageResource(R.drawable.ic_play_arrow_black_24dp)
+        mediaPlayer?.pause()
+        playButton?.setImageResource(R.drawable.ic_play_arrow_black_24dp)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,107 +78,90 @@ class PlaySceneFragment : Fragment() {
         val view = inflater.inflate(R.layout.play_scene, container, false)
 
         // songList initialization
-        songList = arrayOf(
+        songList = arrayListOf(
             Song(R.raw.farzam_finding_hope.toLong(), "FARZAM", "Finding Hope"),
             Song(R.raw.asking_alexandria_alone_in_a_room.toLong(), "Asking Alexandria", "Alone in a room"),
-            Song(R.raw.asking_alexandria_here_i_am.toLong(), "Asking Alexandria", "Here I am"),
-            Song(R.raw.asking_alexandria_send_me_home.toLong(), "Asking Alexandria", "Send me home"),
-            Song(R.raw.demorandum_time_that_im_gone.toLong(), "demorandum", "time that I'm gone"),
-            Song(R.raw.muse_dead_inside.toLong(), "Muse", "Dead inside"),
-            Song(R.raw.illenium_feat_joni_fatora_sleepwalker.toLong(), "Illenium feat.Joni Fatora", "Sleepwalker"),
-            Song(R.raw.xtrullor_nirmiti.toLong(), "Xtrullor", "Nirmiti"),
-            Song(R.raw.porter_robinson_goodbye_to_a_world.toLong(), "Porter Robinson", "Goodbye to a world"),
-            Song(R.raw.vicetone_feat_cozi_zuehlsdorff_nevada.toLong(), "Vicetone feat.Cozi Zuehlsdorff", "Nevada")
+            Song(R.raw.dez_money_wings.toLong(), "Dez Money", "Wings")
         )
 
         initializeValues(view)
-        initializePlayer(this.context!!, view.findViewById(R.id.seekBar), songList[currentSongListIndex].id)
+        initializePlayer(this.context!!, songList[currentSongListIndex].id)
 
         playButton?.setOnClickListener {
-            if (playerActive) pause()
+            if (mediaPlayer!!.isPlaying) pause()
             else play()
         }
 
         view.findViewById<FloatingActionButton>(R.id.addTextBlockButton).setOnClickListener {
-            val view = LayoutInflater.from(this.context).inflate(
+            val v = LayoutInflater.from(this.context).inflate(
                 R.layout.text_block, null, false
             )
-            blocks_scene.addView(view)
+            blocks_scene.addView(v)
             ObjectAnimator.ofInt(play_scene, "scrollY", parent_of_blocks_scene.bottom).setDuration(900).start()
-            view.findViewWithTag<ImageButton>("delete_button").setOnClickListener {
-                view.animate().setDuration(300).alpha(0F).withEndAction {
-                    run { blocks_scene.removeView(view) }
+            v.findViewWithTag<ImageButton>("delete_button").setOnClickListener {
+                v.animate().setDuration(300).alpha(0F).withEndAction {
+                    run { blocks_scene.removeView(v) }
                 }
             }
-            view.findViewWithTag<ImageButton>("edit_button").setOnClickListener {
-                view.findViewWithTag<EditText>("edit_text").visibility = View.VISIBLE
-                view.findViewWithTag<EditText>("edit_text")
-                    .setSelection(view.findViewWithTag<EditText>("edit_text").text.length)
-                view.findViewWithTag<EditText>("edit_text").setText(view.findViewWithTag<TextView>("text_view").text)
-                view.findViewWithTag<TextView>("text_view").visibility = View.GONE
-                view.findViewWithTag<ImageButton>("edit_button").visibility = View.GONE
-                view.findViewWithTag<ImageButton>("ok_button").visibility = View.VISIBLE
+            v.findViewWithTag<ImageButton>("edit_button").setOnClickListener {
+                v.findViewWithTag<EditText>("edit_text").visibility = View.VISIBLE
+                v.findViewWithTag<EditText>("edit_text")
+                    .setSelection(v.findViewWithTag<EditText>("edit_text").text.length)
+                v.findViewWithTag<EditText>("edit_text").setText(v.findViewWithTag<TextView>("text_view").text)
+                v.findViewWithTag<TextView>("text_view").visibility = View.GONE
+                v.findViewWithTag<ImageButton>("edit_button").visibility = View.GONE
+                v.findViewWithTag<ImageButton>("ok_button").visibility = View.VISIBLE
             }
-            view.findViewWithTag<ImageButton>("ok_button").setOnClickListener {
-                view.findViewWithTag<TextView>("text_view").visibility = View.VISIBLE
-                view.findViewWithTag<TextView>("text_view").text = view.findViewWithTag<EditText>("edit_text").text
-                view.findViewWithTag<EditText>("edit_text").visibility = View.GONE
-                view.findViewWithTag<ImageButton>("ok_button").visibility = View.GONE
-                view.findViewWithTag<ImageButton>("edit_button").visibility = View.VISIBLE
-                val imm = view.context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager?
-                imm!!.hideSoftInputFromWindow(view.windowToken, 0)
+            v.findViewWithTag<ImageButton>("ok_button").setOnClickListener {
+                v.findViewWithTag<TextView>("text_view").visibility = View.VISIBLE
+                v.findViewWithTag<TextView>("text_view").text = v.findViewWithTag<EditText>("edit_text").text
+                v.findViewWithTag<EditText>("edit_text").visibility = View.GONE
+                v.findViewWithTag<ImageButton>("ok_button").visibility = View.GONE
+                v.findViewWithTag<ImageButton>("edit_button").visibility = View.VISIBLE
+                val imm = v.context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager?
+                imm!!.hideSoftInputFromWindow(v.windowToken, 0)
             }
         }
         previousButton?.setOnClickListener {
-            if (view.findViewById<SeekBar>(R.id.seekBar).progress > 5000) {
+            if (seekBar!!.progress > 5000) {
                 mediaPlayer!!.seekTo(0)
                 view.findViewById<SeekBar>(R.id.seekBar).progress = 0
-            }
-            else {
+            } else {
                 currentSongListIndex--
-                initializePlayer(this.context!!, view.findViewById(R.id.seekBar), songList[currentSongListIndex].id)
+                initializePlayer(this.context!!, songList[currentSongListIndex].id)
+                play()
             }
         }
         nextButton?.setOnClickListener {
             currentSongListIndex++
-            initializePlayer(this.context!!, view.findViewById(R.id.seekBar), songList[currentSongListIndex].id)
+            initializePlayer(this.context!!, songList[currentSongListIndex].id)
+            play()
         }
-        view.findViewById<SeekBar>(R.id.seekBar).max = mediaPlayer!!.duration
-        view.findViewById<SeekBar>(R.id.seekBar).setOnTouchListener { _, _ ->
+        repeatButton?.setOnClickListener {
+            isRepeating = !isRepeating
+        }
+        seekBar!!.max = mediaPlayer!!.duration
+        seekBar!!.setOnTouchListener { _, _ ->
             mediaPlayer!!.seekTo(view.findViewById<SeekBar>(R.id.seekBar).progress)
+            updateTimeCounters()
             false
         }
-        view.findViewById<SeekBar>(R.id.seekBar).setOnContextClickListener {
-            mediaPlayer!!.seekTo(view.findViewById<SeekBar>(R.id.seekBar).progress)
-            false
-        }
-        view.findViewById<SeekBar>(R.id.seekBar).setOnClickListener {
-            mediaPlayer!!.seekTo(view.findViewById<SeekBar>(R.id.seekBar).progress)
-        }
-        view.findViewById<SeekBar>(R.id.seekBar).setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+        seekBar!!.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-                // TODO Auto-generated method stub
-            }
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-                // TODO Auto-generated method stub
-            }
+            override fun onStartTrackingTouch(seekBar: SeekBar) { clickedOnSeekBar = true }
 
+            @SuppressLint("SetTextI18n")
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                // TODO Auto-generated method stub
-                timeCurrent?.text = "${mediaPlayer!!.currentPosition / 1000 / 60}:" +
-                        "${if (mediaPlayer!!.currentPosition / 1000 % 60 / 10 == 0) "0" else ""}" +
-                        "${mediaPlayer!!.currentPosition / 1000 % 60}"
-                timeLeft?.text = "-${(mediaPlayer!!.duration - mediaPlayer!!.currentPosition) / 1000 / 60}:" +
-                        "${if ((mediaPlayer!!.duration - mediaPlayer!!.currentPosition) / 1000 % 60 / 10 == 0) "0" else ""}" +
-                        "${(mediaPlayer!!.duration - mediaPlayer!!.currentPosition) / 1000 % 60}"
+                updateTimeCounters()
             }
         })
         return view
     }
 
     private fun initializeValues(v: View) {
+        Gradient = v.findViewById(R.id.Gradient)
         songTitle = v.findViewById(R.id.songTitle1)
         songArtist = v.findViewById(R.id.songArtist)
         playButton = v.findViewById(R.id.playButton)
@@ -184,39 +169,56 @@ class PlaySceneFragment : Fragment() {
         timeLeft = v.findViewById(R.id.timeLeft)
         previousButton = v.findViewById(R.id.previousButton)
         nextButton = v.findViewById(R.id.nextButton)
+        repeatButton = v.findViewById(R.id.repeatButton)
+        shuffleButton = v.findViewById(R.id.shuffleButton)
+        seekBar = v.findViewById(R.id.seekBar)
     }
 
-    private fun initializePlayer(context: Context, seekBar: SeekBar, songId: Long) {
-        if (mediaPlayer != null) pause()
+    private fun initializePlayer(context: Context, songId: Long) {
+        if (mediaPlayer != null) {
+            pause()
+            mediaPlayer!!.reset()
+        }
         mediaPlayer = MediaPlayer.create(context, songId.toInt())
-        seekBar.progress = 0
+        seekBar!!.progress = 0
         mediaPlayer!!.seekTo(0)
-        seekBar.max = mediaPlayer?.duration!!
-        timeCurrent?.text = "${mediaPlayer!!.currentPosition / 1000 / 60}:" +
-                "${if (mediaPlayer!!.currentPosition / 1000 % 60 / 10 == 0) "0" else ""}" +
-                "${mediaPlayer!!.currentPosition / 1000 % 60}"
-        timeLeft?.text = "-${(mediaPlayer!!.duration - mediaPlayer!!.currentPosition) / 1000 / 60}:" +
-                "${if ((mediaPlayer!!.duration - mediaPlayer!!.currentPosition) / 1000 % 60 / 10 == 0) "0" else ""}" +
-                "${(mediaPlayer!!.duration - mediaPlayer!!.currentPosition) / 1000 % 60}"
+        seekBar!!.max = mediaPlayer?.duration!!
+        updateTimeCounters()
         songArtist?.text = songList[currentSongListIndex].artist
         songTitle?.text = songList[currentSongListIndex].title
+        mediaPlayer!!.setOnCompletionListener {
+            if(!isRepeating) {
+                currentSongListIndex++
+                initializePlayer(this.context!!, songList[currentSongListIndex].id)
+                play()
+            }
+        }
     }
 
-    private fun startPlayProgressUpdater(seekBar: SeekBar) {
-        seekBar.progress = mediaPlayer!!.currentPosition
 
+    private fun startPlayProgressUpdater() {
+        if(!clickedOnSeekBar) seekBar!!.progress = mediaPlayer!!.currentPosition
+        else { mediaPlayer!!.seekTo(seekBar!!.progress); clickedOnSeekBar = false }
         if (mediaPlayer!!.isPlaying) {
-            val notification = Runnable { startPlayProgressUpdater(seekBar) }
+            val notification = Runnable { startPlayProgressUpdater() }
             handler.postDelayed(notification, 100)
-            timeCurrent?.text = "${mediaPlayer!!.currentPosition / 1000 / 60}:" +
-                    "${if (mediaPlayer!!.currentPosition / 1000 % 60 / 10 == 0) "0" else ""}" +
-                    "${mediaPlayer!!.currentPosition / 1000 % 60}"
-            timeLeft?.text = "-${(mediaPlayer!!.duration - mediaPlayer!!.currentPosition) / 1000 / 60}:" +
-                    "${if ((mediaPlayer!!.duration - mediaPlayer!!.currentPosition) / 1000 % 60 / 10 == 0) "0" else ""}" +
-                    "${(mediaPlayer!!.duration - mediaPlayer!!.currentPosition) / 1000 % 60}"
+            updateTimeCounters()
         } else {
             mediaPlayer!!.pause()
         }
+    }
+    @SuppressLint("SetTextI18n")
+    private fun updateTimeCounters(){
+        timeCurrent?.text = "${seekBar!!.progress / 1000 / 60}:" +
+                (if (seekBar!!.progress / 1000 % 60 / 10 == 0) "0" else "") +
+                "${seekBar!!.progress / 1000 % 60}"
+        timeLeft?.text = "-${(seekBar!!.max - seekBar!!.progress) / 1000 / 60}:" +
+                (if ((seekBar!!.max - seekBar!!.progress) / 1000 % 60 / 10 == 0) "0" else "") +
+                "${(seekBar!!.max - seekBar!!.progress) / 1000 % 60}"
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        pause()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
