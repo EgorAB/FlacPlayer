@@ -19,9 +19,9 @@
                  android:layout_marginBottom="?attr/actionBarSize"/>
         <include layout="@layout/player_tabs"
                  android:visibility="visible"
-                 android:layout_marginBottom="?attr/actionBarSize"
                  android:layout_height="match_parent"
-                 android:layout_width="match_parent"/>
+                 android:layout_width="match_parent" tools:layout_editor_absoluteY="28dp"
+                 tools:layout_editor_absoluteX="16dp"/>
         <include layout="@layout/more_layout"
                  android:visibility="gone"
                  android:layout_marginBottom="?attr/actionBarSize"

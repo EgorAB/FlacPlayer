@@ -5,11 +5,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,14 +31,14 @@ class PlaySceneFragment : Fragment() {
     private var isRepeating: Boolean = false
         set(value) {
             field = value
-            repeatButton?.setColorFilter(resources.getColor(if (value) R.color.materialBlack else R.color.materialExtraLightGray))
+            repeatButton?.setColorFilter(resources.getColor(if (value) R.color.darkThemeColorPrimaryDark else R.color.materialExtraLightGray))
             mediaPlayer?.isLooping = value
         }
 
     private var clickedOnSeekBar = false
     private var handler = Handler()
 
-    private var mediaPlayer: MediaPlayer? = null
+    public var mediaPlayer: MediaPlayer? = null
     private var timeCurrent: TextView? = null
     private var timeLeft: TextView? = null
     private var playButton: ImageButton? = null
@@ -52,7 +52,7 @@ class PlaySceneFragment : Fragment() {
     private var repeatButton: ImageButton? = null
     private var shuffleButton: ImageButton? = null
 
-    private fun play() {
+    public fun play() {
         try {
             mediaPlayer!!.start()
             startPlayProgressUpdater()
@@ -62,7 +62,7 @@ class PlaySceneFragment : Fragment() {
         }
     }
 
-    private fun pause() {
+    public fun pause() {
         mediaPlayer?.pause()
         playButton?.setImageResource(R.drawable.ic_play_arrow_black_24dp)
     }
@@ -86,42 +86,11 @@ class PlaySceneFragment : Fragment() {
         )
 
         initializeValues(view)
-        initializePlayer(this.context!!, songList[currentSongListIndex].id)
+        initializePlayer(songList[currentSongListIndex].id)
 
         playButton?.setOnClickListener {
             if (mediaPlayer!!.isPlaying) pause()
             else play()
-        }
-
-        view.findViewById<FloatingActionButton>(R.id.addTextBlockButton).setOnClickListener {
-            val v = LayoutInflater.from(this.context).inflate(
-                R.layout.text_block, null, false
-            )
-            blocks_scene.addView(v)
-            ObjectAnimator.ofInt(play_scene, "scrollY", parent_of_blocks_scene.bottom).setDuration(900).start()
-            v.findViewWithTag<ImageButton>("delete_button").setOnClickListener {
-                v.animate().setDuration(300).alpha(0F).withEndAction {
-                    run { blocks_scene.removeView(v) }
-                }
-            }
-            v.findViewWithTag<ImageButton>("edit_button").setOnClickListener {
-                v.findViewWithTag<EditText>("edit_text").visibility = View.VISIBLE
-                v.findViewWithTag<EditText>("edit_text")
-                    .setSelection(v.findViewWithTag<EditText>("edit_text").text.length)
-                v.findViewWithTag<EditText>("edit_text").setText(v.findViewWithTag<TextView>("text_view").text)
-                v.findViewWithTag<TextView>("text_view").visibility = View.GONE
-                v.findViewWithTag<ImageButton>("edit_button").visibility = View.GONE
-                v.findViewWithTag<ImageButton>("ok_button").visibility = View.VISIBLE
-            }
-            v.findViewWithTag<ImageButton>("ok_button").setOnClickListener {
-                v.findViewWithTag<TextView>("text_view").visibility = View.VISIBLE
-                v.findViewWithTag<TextView>("text_view").text = v.findViewWithTag<EditText>("edit_text").text
-                v.findViewWithTag<EditText>("edit_text").visibility = View.GONE
-                v.findViewWithTag<ImageButton>("ok_button").visibility = View.GONE
-                v.findViewWithTag<ImageButton>("edit_button").visibility = View.VISIBLE
-                val imm = v.context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager?
-                imm!!.hideSoftInputFromWindow(v.windowToken, 0)
-            }
         }
         previousButton?.setOnClickListener {
             if (seekBar!!.progress > 5000) {
@@ -129,13 +98,13 @@ class PlaySceneFragment : Fragment() {
                 view.findViewById<SeekBar>(R.id.seekBar).progress = 0
             } else {
                 currentSongListIndex--
-                initializePlayer(this.context!!, songList[currentSongListIndex].id)
+                initializePlayer(songList[currentSongListIndex].id)
                 play()
             }
         }
         nextButton?.setOnClickListener {
             currentSongListIndex++
-            initializePlayer(this.context!!, songList[currentSongListIndex].id)
+            initializePlayer(songList[currentSongListIndex].id)
             play()
         }
         repeatButton?.setOnClickListener {
@@ -175,13 +144,12 @@ class PlaySceneFragment : Fragment() {
         seekBar = v.findViewById(R.id.seekBar)
     }
 
-    private fun initializePlayer(context: Context, songId: Long) {
+    public fun initializePlayer(songId: Long) {
         if (mediaPlayer != null) {
             pause()
             mediaPlayer!!.reset()
         }
-        mediaPlayer = MediaPlayer.create(context, songId.toInt())
-
+        mediaPlayer = MediaPlayer.create(this.context!!, songId.toInt())
 
         seekBar!!.progress = 0
         mediaPlayer!!.seekTo(0)
@@ -192,13 +160,35 @@ class PlaySceneFragment : Fragment() {
         mediaPlayer!!.setOnCompletionListener {
             if(!isRepeating) {
                 currentSongListIndex++
-                initializePlayer(this.context!!, songList[currentSongListIndex].id)
+                initializePlayer(songList[currentSongListIndex].id)
                 play()
             }
         }
     }
 
+    public fun initializePlayer(song: Song) {
+        if (mediaPlayer != null) {
+            pause()
+            mediaPlayer!!.reset()
+        }
+        mediaPlayer = MediaPlayer.create(this.context!!, song.uri)
 
+        seekBar!!.progress = 0
+        mediaPlayer!!.seekTo(0)
+        seekBar!!.max = mediaPlayer?.duration!!
+        updateTimeCounters()
+        songArtist?.text = song.artist
+        songTitle?.text = song.title
+        mediaPlayer!!.setOnCompletionListener {
+            if(!isRepeating) {
+                // init player MainActivity.nextsong()
+                // if(nextsong != null)
+                initializePlayer(song)
+                play()
+                // else ..
+            }
+        }
+    }
     private fun startPlayProgressUpdater() {
         if(!clickedOnSeekBar) seekBar!!.progress = mediaPlayer!!.currentPosition
         else { mediaPlayer!!.seekTo(seekBar!!.progress); clickedOnSeekBar = false }

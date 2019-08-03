@@ -1,5 +1,6 @@
 package com.example.flacplayer
 
+import android.app.AlertDialog
 import android.content.ContentResolver
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -22,7 +23,6 @@ class PlaylistSceneFragment : Fragment() {
     private var songListView: ListView? = null
     private var playSceneFragment: PlaylistSceneFragment? = null
     private val mListener: OnFragmentInteractionListener? = null
-
     interface OnFragmentInteractionListener {
         fun onFragmentInteraction(id: Long)
     }
@@ -30,20 +30,29 @@ class PlaylistSceneFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.playlist_scene, container, false)
         songListView = view.findViewById(R.id.songListView)
+        val songAdapter = SongAdapter(this.context!!, songList)
         if(songList.size != 0) {
-            songListView?.adapter = SongAdapter(this.context!!, songList)
+            songListView?.adapter = songAdapter
             view.findViewById<Button>(R.id.openFolderButton).visibility = View.INVISIBLE
         }
 
         songListView?.setOnItemClickListener { parent, v, position, id ->
             Log.d("DEBUG", songList[position].id.toString())
         }
-
-        view.findViewById<Button>(R.id.openFolderButton).setOnClickListener {
-            getSongList(view)
-            if(ContextCompat.checkSelfPermission(view.context, android.Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED) view.findViewById<Button>(R.id.openFolderButton).visibility = View.INVISIBLE
+        songListView?.setOnItemLongClickListener { parent, v, position, id ->
+            AlertDialog.Builder(this.context).run{
+                setTitle("Вы уверены, что хотите удалить трек ${songList[position].artist} — ${songList[position].title}?")
+                setPositiveButton("Да") { _, _ ->
+                    songAdapter.notifyDataSetChanged()
+                }
+                setNegativeButton("Нет") { _, _ -> {} }
+            }.create().show()
+            true
         }
+
+        getSongList(view)
+        if(ContextCompat.checkSelfPermission(view.context, android.Manifest.permission.READ_EXTERNAL_STORAGE) ==
+            PackageManager.PERMISSION_GRANTED) view.findViewById<Button>(R.id.openFolderButton).visibility = View.INVISIBLE
         return view
     }
     private fun getSongList(view: View){
