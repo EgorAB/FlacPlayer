@@ -11,23 +11,55 @@
             android:background="@color/white"
             tools:context=".MainActivity">
 
-        <include layout="@layout/home_layout"
-                 android:visibility="gone"
-                 android:layout_width="match_parent"
-                 android:layout_height="match_parent"
-                 tools:layout_editor_absoluteX="125dp"
-                 android:layout_marginBottom="?attr/actionBarSize"/>
+        <android.support.design.widget.AppBarLayout
+                android:id="@+id/appBar"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:layout_constraintTop_toTopOf="parent">
+            <android.support.constraint.ConstraintLayout android:layout_width="match_parent"
+                                                         android:layout_height="match_parent">
+                <ImageButton
+                        android:id="@+id/close"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:src="@drawable/ic_close_black_24dp"
+                        android:backgroundTint="@color/colorPrimary"
+                        android:scaleType="center"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="4dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="2dp"
+                />
+                <ImageButton
+                        android:id="@+id/delete"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:src="@drawable/ic_delete_black_24dp"
+                        android:backgroundTint="@color/colorPrimary"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="4dp"
+                        app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="2dp"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+            </android.support.constraint.ConstraintLayout>
+        </android.support.design.widget.AppBarLayout>
         <include layout="@layout/player_tabs"
                  android:visibility="visible"
                  android:layout_height="match_parent"
-                 android:layout_width="match_parent" tools:layout_editor_absoluteY="28dp"
-                 tools:layout_editor_absoluteX="16dp"/>
+                 android:layout_width="match_parent"
+                 tools:layout_editor_absoluteX="16dp"
+                 tools:layout_editor_absoluteY="56dp"/>
         <include layout="@layout/more_layout"
                  android:visibility="gone"
                  android:layout_marginBottom="?attr/actionBarSize"
                  android:layout_height="match_parent"
                  android:layout_width="match_parent"/>
 
+        <include layout="@layout/home_layout"
+                 android:visibility="gone"
+                 android:layout_width="match_parent"
+                 android:layout_height="match_parent"
+                 tools:layout_editor_absoluteX="125dp"
+        />
         <android.support.design.widget.BottomNavigationView
                 app:labelVisibilityMode="labeled"
                 android:layout_width="match_parent"

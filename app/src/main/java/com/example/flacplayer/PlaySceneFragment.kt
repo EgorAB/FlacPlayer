@@ -1,29 +1,31 @@
 package com.example.flacplayer
 
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import kotlinx.android.synthetic.main.blocks_scene.*
-import kotlinx.android.synthetic.main.play_scene.*
+import android.widget.TextView
+import java.lang.ClassCastException
 
 
 class PlaySceneFragment : Fragment() {
 
-    var songList: ArrayList<Song> = arrayListOf()
+    interface PlaySceneInteractionListener{
+        fun nextSong(select: Boolean = false): Song?
+        fun prevSong(select: Boolean = false): Song
+    }
 
+    var mListener: PlaySceneInteractionListener? = null
+    var songList: ArrayList<Song> = arrayListOf()
     private var currentSongListIndex: Int = 0
         set(value) {
             field = if (value >= 0) if (value >= songList.size) 0 else value else songList.size - 1
@@ -52,6 +54,15 @@ class PlaySceneFragment : Fragment() {
     private var repeatButton: ImageButton? = null
     private var shuffleButton: ImageButton? = null
 
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        try{
+            mListener = context as PlaySceneInteractionListener
+        } catch (e: ClassCastException){
+            throw ClassCastException(context.toString() + " должен реализовывать интерфейс PlaySceneInteractionListener")
+        }
+    }
+
     public fun play() {
         try {
             mediaPlayer!!.start()
@@ -77,7 +88,6 @@ class PlaySceneFragment : Fragment() {
         // можно проводить все требуемые манипуляции
         // создаем view-элемент из разметки и проводим с ним манипуляции, после чего возвращаем из метода
         val view = inflater.inflate(R.layout.play_scene, container, false)
-
         // songList initialization
         songList = arrayListOf(
             Song(R.raw.farzam_finding_hope.toLong(), "FARZAM", "Finding Hope"),
@@ -97,15 +107,20 @@ class PlaySceneFragment : Fragment() {
                 mediaPlayer!!.seekTo(0)
                 view.findViewById<SeekBar>(R.id.seekBar).progress = 0
             } else {
-                currentSongListIndex--
-                initializePlayer(songList[currentSongListIndex].id)
+                // currentSongListIndex--
+                // initializePlayer(songList[currentSongListIndex].id)
+                initializePlayer(mListener!!.prevSong(true))
                 play()
             }
         }
         nextButton?.setOnClickListener {
-            currentSongListIndex++
-            initializePlayer(songList[currentSongListIndex].id)
-            play()
+            // currentSongListIndex++
+            // initializePlayer(songList[currentSongListIndex].id)
+            val s: Song? = mListener?.nextSong(true)
+            if(s != null){
+                initializePlayer(s); play()
+            }
+            else pause()
         }
         repeatButton?.setOnClickListener {
             isRepeating = !isRepeating
@@ -179,13 +194,30 @@ class PlaySceneFragment : Fragment() {
         updateTimeCounters()
         songArtist?.text = song.artist
         songTitle?.text = song.title
+        setOptimalTextSize(song.artist, song.title)
         mediaPlayer!!.setOnCompletionListener {
             if(!isRepeating) {
-                // init player MainActivity.nextsong()
-                // if(nextsong != null)
-                initializePlayer(song)
-                play()
-                // else ..
+                val s: Song? = mListener?.nextSong(true)
+                if(s != null){
+                    initializePlayer(s); play()
+                }
+                else pause()
+            }
+        }
+    }
+    private fun setOptimalTextSize(artist:String, title:String){
+        when(title.length){
+            in 0..22 -> {
+                songArtist?.textSize = 22F
+                songTitle?.textSize = 36F
+            }
+            in 23..27 -> {
+                songArtist?.textSize = 20F
+                songTitle?.textSize = 30F
+            }
+            else -> {
+                songArtist?.textSize = 18F
+                songTitle?.textSize = 24F
             }
         }
     }
