@@ -6,20 +6,81 @@
                                         xmlns:android="http://schemas.android.com/apk/res/android"
                                         android:layout_width="match_parent">
     <android.support.constraint.ConstraintLayout
+            android:animateLayoutChanges="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
             tools:context=".MainActivity">
+        <android.support.design.widget.AppBarLayout
+                android:id="@+id/playlistBar"
+                android:alpha="0"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:layout_constraintTop_toTopOf="parent">
+            <android.support.constraint.ConstraintLayout android:layout_width="match_parent"
+                                                         android:layout_height="match_parent">
+                <TextView
+                        android:text="Плейлист"
+                        android:gravity="center"
+                        android:textSize="28sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+            </android.support.constraint.ConstraintLayout>
+        </android.support.design.widget.AppBarLayout>
 
         <android.support.design.widget.AppBarLayout
-                android:id="@+id/appBar"
+                android:id="@+id/playBar"
+                android:alpha="0"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:layout_constraintTop_toTopOf="parent">
+            <android.support.constraint.ConstraintLayout android:layout_width="match_parent"
+                                                         android:layout_height="match_parent">
+                <TextView
+                        android:text="Трек"
+                        android:gravity="center"
+                        android:textSize="28sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+            </android.support.constraint.ConstraintLayout>
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.design.widget.AppBarLayout
+                android:id="@+id/libraryBar"
+                android:alpha="0"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:layout_constraintTop_toTopOf="parent">
+            <android.support.constraint.ConstraintLayout android:layout_width="match_parent"
+                                                         android:layout_height="match_parent">
+                <TextView
+                        android:text="Библиотека"
+                        android:gravity="center"
+                        android:textSize="28sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+            </android.support.constraint.ConstraintLayout>
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.design.widget.AppBarLayout
+                android:id="@+id/playlistItemSelectedBar"
+                android:alpha="0"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 app:layout_constraintTop_toTopOf="parent">
             <android.support.constraint.ConstraintLayout android:layout_width="match_parent"
                                                          android:layout_height="match_parent">
                 <ImageButton
-                        android:id="@+id/close"
+                        android:tag="close"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
                         android:src="@drawable/ic_close_black_24dp"
@@ -28,10 +89,9 @@
                         app:layout_constraintTop_toTopOf="parent"
                         android:layout_marginTop="4dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        android:layout_marginStart="2dp"
-                />
+                        android:layout_marginStart="2dp"/>
                 <ImageButton
-                        android:id="@+id/delete"
+                        android:tag="delete"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
                         android:src="@drawable/ic_delete_black_24dp"
@@ -42,6 +102,8 @@
                         app:layout_constraintBottom_toBottomOf="parent"/>
             </android.support.constraint.ConstraintLayout>
         </android.support.design.widget.AppBarLayout>
+
+
         <include layout="@layout/player_tabs"
                  android:visibility="visible"
                  android:layout_height="match_parent"
@@ -58,8 +120,7 @@
                  android:visibility="gone"
                  android:layout_width="match_parent"
                  android:layout_height="match_parent"
-                 tools:layout_editor_absoluteX="125dp"
-        />
+                 tools:layout_editor_absoluteX="125dp"/>
         <android.support.design.widget.BottomNavigationView
                 app:labelVisibilityMode="labeled"
                 android:layout_width="match_parent"
@@ -71,13 +132,4 @@
                 app:itemTextColor="@color/bottom_navigation_item_background_colors"
                 app:layout_constraintBottom_toBottomOf="parent"/>
     </android.support.constraint.ConstraintLayout>
-
-    <!--<android.support.design.widget.NavigationView-->
-            <!--app:headerLayout="@layout/nav_header_main"-->
-            <!--app:menu="@menu/activity_main_drawer"-->
-            <!--android:fitsSystemWindows="true"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_gravity="start"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:id="@+id/navigationView"/>-->
 </android.support.v4.widget.DrawerLayout>

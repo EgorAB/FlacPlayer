@@ -2,22 +2,20 @@ package com.example.flacplayer
 
 import android.content.ContentResolver
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.support.design.widget.TabLayout
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.ImageButton
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.home_layout.*
 import kotlinx.android.synthetic.main.more_layout.*
 import kotlinx.android.synthetic.main.player_tabs.*
-import android.provider.MediaStore
-import android.view.Menu
-import android.view.MenuInflater
 
 
 class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionListener,
@@ -30,6 +28,7 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
     private val playlistFragment: PlaylistFragment = PlaylistFragment()
     private val playSceneFragment: PlaySceneFragment = PlaySceneFragment()
 
+
     var songList = arrayListOf<Song>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,19 +37,29 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
         setContentView(R.layout.activity_main)
         getSongList()
         selectedScene = player_tabs
-        appBar.alpha = 0f
+        playlistItemSelectedBar.alpha = 0f
+        playlistItemSelectedBar.findViewWithTag<ImageButton>("delete").setOnClickListener {
+            playlistFragment.PISBarDeleteButton()
+        }
+        playlistItemSelectedBar.findViewWithTag<ImageButton>("close").setOnClickListener {
+            playlistFragment.PISBarCloseButton()
+        }
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            val appBars = arrayListOf<View>(libraryBar, playBar, playlistBar)
             override fun onTabSelected(tab: TabLayout.Tab) {
                 if (tab.position == 2 || tab.position == 0) {
                     hideBottomNavigationView()
-                    showAppBar()
+                    // showPISBar()
                 }
+                appBars[tab.position].alpha = 1F
             }
             override fun onTabUnselected(tab: TabLayout.Tab) {
                 if (tab.position == 2 || tab.position == 0) {
                     showBottomNavigationView()
-                    hideAppBar()
+                    // hidePISBar()
                 }
+                if(tab.position == 2) playlistFragment.PISBarCloseButton()
+                appBars[tab.position].alpha = 0F
             }
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
@@ -159,13 +168,15 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
         bottomNavigationView.animate().translationY(0f).duration = 200
     }
 
-    fun hideAppBar(){
-        appBar.clearAnimation()
-        appBar.animate().alpha(0f).duration = 200
+    // hide playlistItemSelectedBar
+    fun hidePISBar(){
+        playlistItemSelectedBar.clearAnimation()
+        playlistItemSelectedBar.animate().alpha(0f).duration = 200
     }
 
-    fun showAppBar(){
-        appBar.clearAnimation()
-        appBar.animate().alpha(1f).duration = 200
+    // show playlistItemSelectedBar
+    fun showPISBar(){
+        playlistItemSelectedBar.clearAnimation()
+        playlistItemSelectedBar.animate().alpha(1f).duration = 200
     }
 }
