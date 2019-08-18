@@ -3,16 +3,16 @@
       xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/homeButton" android:title="@string/menu_icon_home_button"
-          app:showAsAction="ifRoom"
+          app:showAsAction="always"
           android:color = "@color/materialDarkGray"
           android:icon="@drawable/ic_home_black_24dp"/>
     <item android:id="@+id/playButton" android:title="@string/menu_icon_play_button"
-          app:showAsAction="ifRoom"
+          app:showAsAction="always"
           android:color = "@color/materialDarkGray"
           android:icon="@drawable/ic_play_circle_filled_black_24dp"/>
 
     <item android:id="@+id/moreButton" android:title="@string/menu_icon_orher_button"
-          app:showAsAction="ifRoom"
+          app:showAsAction="always"
           android:color = "@color/materialDarkGray"
           android:icon="@drawable/ic_more_horiz_black_24dp"/>
 </menu>

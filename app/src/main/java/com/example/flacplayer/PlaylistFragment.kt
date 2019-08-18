@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,21 +26,25 @@ class PlaylistFragment : Fragment() {
     }
 
     var mListener: PlaylistInteractionListener? = null
-    var songList: ArrayList<Song> = arrayListOf()
+    // var songList: ArrayList<Song> = arrayListOf()
     var songViews: ArrayList<View> = arrayListOf()
     var playlist: LinearLayout? = null
+
+    // корневая view плейлиста
+    var playlistView: View? = null
 
     var currentSongView: View? = null
 
     val selectedItems: ArrayList<View> = arrayListOf()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view: View = inflater.inflate(R.layout.playlist, container, false)
-        playlist = view.findViewById(R.id.playlist)
-        songList = (context as MainActivity).songList
-        fill()
-        selectSong(currentSongView)
-        return view
+        if (playlistView == null) {
+            playlistView = inflater.inflate(R.layout.playlist, container, false)
+            playlist = playlistView?.findViewById(R.id.playlist)
+            // songList = (context as MainActivity).songList
+            selectSong(currentSongView)
+        }
+        return playlistView
     }
 
     override fun onAttach(context: Context?) {
@@ -51,12 +56,19 @@ class PlaylistFragment : Fragment() {
         }
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        if (songViews.size == 0) update()
+        // else refill()
+    }
+
     override fun onPause() {
         super.onPause()
     }
 
     override fun onResume() {
         super.onResume()
+        selectSong(currentSongView)
     }
 
     private fun deselectSong(songV: View?) {
@@ -65,7 +77,7 @@ class PlaylistFragment : Fragment() {
         songV.findViewWithTag<TextView>("title").setTextColor(resources.getColor(R.color.materialDarkGray))
     }
 
-    private fun selectSong(songV: View?) {
+    public fun selectSong(songV: View?) {
         if (songV == null) return
         deselectSong(currentSongView)
         songV.findViewWithTag<TextView>("artist").setTextColor(resources.getColor(R.color.darkThemeColorPrimary))
@@ -74,46 +86,60 @@ class PlaylistFragment : Fragment() {
     }
 
     private fun songFromView(v: View?): Song {
-        if (v == null) return songList[0]
-        if(v in songViews) return songList[songViews.indexOf(v)]
-        return songList[0]
+        if (v == null) return (activity as MainActivity).songList[0]
+        Log.d(
+            "DEBUG",
+            "songViews.indexOf(v)=${songViews.indexOf(v)}, songList.size=${(activity as MainActivity).songList.size}"
+        )
+        if (v in songViews) return (activity as MainActivity).songList[songViews.indexOf(v)]
+        return (activity as MainActivity).songList[0]
     }
 
     // вернет песню, если она первая в списке, иначе предыдущую
     public fun prevSong(select: Boolean = false): Song {
         val song: Song = songFromView(currentSongView)
-        if (song == songList[0]) return songList[0]
+        if (song == (activity as MainActivity).songList[0]) return (activity as MainActivity).songList[0]
         var index = 0
-        for (i in 1 until songList.size)
-            if (song == songList[i]) index = i - 1
+        for (i in 1 until (activity as MainActivity).songList.size)
+            if (song == (activity as MainActivity).songList[i]) index = i - 1
         if (select) selectSong(songViews[index])
-        return songList[index]
+        return (activity as MainActivity).songList[index]
     }
 
     // вернет null, если текущая песня последняя в списке
     public fun nextSong(select: Boolean = false): Song? {
         val song: Song = songFromView(currentSongView)
-        if (song == songList.last()) return null
+        if (song == (activity as MainActivity).songList.last()) return null
         var index = 0
-        for (i in 0 until songList.size - 1)
-            if (song == songList[i]) index = i + 1
+        for (i in 0 until (activity as MainActivity).songList.size - 1)
+            if (song == (activity as MainActivity).songList[i]) index = i + 1
         if (select) selectSong(songViews[index])
-        return songList[index]
+        return (activity as MainActivity).songList[index]
     }
 
     // очистка объектов, составляющих плейлист
     private fun clear() {
+        Log.d("DEBUG", "CLEAR")
         songViews.forEach {
             playlist?.removeView(it)
         }
         songViews.clear()
     }
 
+    // заполнение view, которые были выгружены из памяти
+    private fun refill() {
+        Log.d("DEBUG", "RE-FILL")
+        songViews.forEach {
+            playlist?.addView(it)
+        }
+    }
+
     // заполнение плейлиста треками
     private fun fill(content: ArrayList<Song>? = null) {
-        if (content == null) fill(songList)
+        if (content == null) fill((activity as MainActivity).songList)
+        Log.d("DEBUG", "FILL")
         content?.forEach {
-            val v = LayoutInflater.from(this.context).inflate(R.layout.song, null, false)
+            val v = LayoutInflater.from(context).inflate(R.layout.song, null, false)
             playlist?.addView(v)
             songViews.add(v)
             v.findViewWithTag<TextView>("title").text = it.title
@@ -134,15 +160,14 @@ class PlaylistFragment : Fragment() {
                         }
                     }
                 } else {
-                    if(v in selectedItems) {
+                    if (v in selectedItems) {
                         selectedItems.remove(v)
-                        if(songFromView(v).coverUri == null)
+                        if (songFromView(v).coverUri == null)
                             v.findViewWithTag<ImageView>("cover")
-                                .setImageDrawable(resources.getDrawable(R.drawable.ic_corgi_icon_final))
+                                .setImageDrawable(resources.getDrawable(R.mipmap.ic_corgi_icon_final))
                         else v.findViewWithTag<ImageView>("cover").setImageURI(Uri.parse(songFromView(v).coverUri))
-                        if(selectedItems.size == 0) (activity as MainActivity).hidePISBar()
-                    }
-                    else {
+                        if (selectedItems.size == 0) (activity as MainActivity).hidePISBar()
+                    } else {
                         selectedItems.add(v)
                         v.findViewWithTag<ImageView>("cover")
                             .setImageDrawable(resources.getDrawable(R.drawable.ic_done_black_24dp))
@@ -154,15 +179,14 @@ class PlaylistFragment : Fragment() {
                 (activity as MainActivity).showPISBar()
                 v.findViewWithTag<ImageView>("cover")
                     .setImageDrawable(resources.getDrawable(R.drawable.ic_done_black_24dp))
-                if(v in selectedItems) {
+                if (v in selectedItems) {
                     selectedItems.remove(v)
-                    if(songFromView(v).coverUri == null)
+                    if (songFromView(v).coverUri == null)
                         v.findViewWithTag<ImageView>("cover")
-                            .setImageDrawable(resources.getDrawable(R.drawable.ic_corgi_icon_final))
+                            .setImageDrawable(resources.getDrawable(R.mipmap.ic_corgi_icon_final))
                     else v.findViewWithTag<ImageView>("cover").setImageURI(Uri.parse(songFromView(v).coverUri))
-                    if(selectedItems.size == 0) (activity as MainActivity).hidePISBar()
-                }
-                else {
+                    if (selectedItems.size == 0) (activity as MainActivity).hidePISBar()
+                } else {
                     selectedItems.add(v)
                     v.findViewWithTag<ImageView>("cover")
                         .setImageDrawable(resources.getDrawable(R.drawable.ic_done_black_24dp))
@@ -172,21 +196,21 @@ class PlaylistFragment : Fragment() {
         }
     }
 
-    public fun PISBarCloseButton(){
-        for(v in selectedItems){
-            if(songFromView(v).coverUri == null)
+    public fun PISBarCloseButton() {
+        for (v in selectedItems) {
+            if (songFromView(v).coverUri == null)
                 v.findViewWithTag<ImageView>("cover")
-                    .setImageDrawable(resources.getDrawable(R.drawable.ic_corgi_icon_final))
+                    .setImageDrawable(resources.getDrawable(R.mipmap.ic_corgi_icon_final))
             else v.findViewWithTag<ImageView>("cover").setImageURI(Uri.parse(songFromView(v).coverUri))
         }
         selectedItems.clear()
         (activity as MainActivity).hidePISBar()
     }
 
-    public fun PISBarDeleteButton(){
-        for(v in selectedItems){
+    public fun PISBarDeleteButton() {
+        for (v in selectedItems) {
             songViews.remove(v)
-            songList.remove(songFromView(v))
+            (activity as MainActivity).songList.remove(songFromView(v))
             playlist?.removeView(v)
         }
         selectedItems.clear()
@@ -195,6 +219,7 @@ class PlaylistFragment : Fragment() {
 
     // обновление плейлиста
     public fun update(content: ArrayList<Song>? = null) {
+        Log.d("DEBUG", "UPDATE")
         clear()
         fill(content)
     }

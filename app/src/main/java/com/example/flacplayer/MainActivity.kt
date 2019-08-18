@@ -1,18 +1,24 @@
 package com.example.flacplayer
 
 import android.content.ContentResolver
+import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.TabLayout
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
+import android.util.AttributeSet
 import android.view.View
+import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.bottom_sheet.*
 import kotlinx.android.synthetic.main.home_layout.*
 import kotlinx.android.synthetic.main.more_layout.*
 import kotlinx.android.synthetic.main.player_tabs.*
@@ -35,6 +41,10 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
         //setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        window.attributes.layoutInDisplayCutoutMode =
+            WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+
         getSongList()
         selectedScene = player_tabs
         playlistItemSelectedBar.alpha = 0f
@@ -51,6 +61,9 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
                     hideBottomNavigationView()
                     // showPISBar()
                 }
+
+                if(tab.position == 2) playlistFragment.selectSong(playlistFragment.currentSongView)
+
                 appBars[tab.position].alpha = 1F
             }
             override fun onTabUnselected(tab: TabLayout.Tab) {
@@ -63,24 +76,24 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
             }
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
-        bottomNavigationView.selectedItemId = R.id.playButton
-        bottomNavigationView.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.homeButton -> {
-                    selectScene(home_layout)
-                    true
-                }
-                R.id.playButton -> {
-                    selectScene(player_tabs)
-                    true
-                }
-                R.id.moreButton -> {
-                    selectScene(more_layout)
-                    true
-                }
-                else -> true
-            }
-        }
+//        bottomNavigationView.selectedItemId = R.id.playButton
+//        bottomNavigationView.setOnNavigationItemSelectedListener {
+//            when (it.itemId) {
+//                R.id.homeButton -> {
+//                    selectScene(home_layout)
+//                    true
+//                }
+//                R.id.playButton -> {
+//                    selectScene(player_tabs)
+//                    true
+//                }
+//                R.id.moreButton -> {
+//                    selectScene(more_layout)
+//                    true
+//                }
+//                else -> true
+//            }
+//        }
 
         setupViewPager(viewPager)
         tabLayout.setupWithViewPager(viewPager)
@@ -91,6 +104,9 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
                 "О приложении"
             )
         )
+
+//        val bottomSheetBehavior: BottomSheetBehavior<LinearLayout> = BottomSheetBehavior.from(bottom_sheet)
+//        bottomSheetBehavior.isHideable = false
     }
 
     // имплементация PlaylistInteractionListener
@@ -119,7 +135,6 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
         selectedScene = newScene
         selectedScene?.visibility = View.VISIBLE
     }
-
     private fun setupViewPager(viewPager: ViewPager) {
         val adapter = ViewPagerAdapter(supportFragmentManager)
         adapter.addFragment(libraryFragment, "Библиотека")

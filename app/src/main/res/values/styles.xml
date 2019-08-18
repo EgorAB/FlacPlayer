@@ -9,8 +9,8 @@
     </style>
     <style name="SeekBarColor"
            parent="Widget.AppCompat.SeekBar">
-        <item name="android:minHeight">10dp</item>
-        <item name="android:maxHeight">10dp</item>
+        <item name="android:minHeight">20dp</item>
+        <item name="android:maxHeight">20dp</item>
         <item name="colorAccent">@color/darkThemeColorPrimary</item>
     </style>
     <style name="AppTheme.Launcher">
