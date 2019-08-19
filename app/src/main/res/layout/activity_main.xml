@@ -110,6 +110,7 @@
             </android.support.constraint.ConstraintLayout>
         </android.support.design.widget.AppBarLayout>
 
+
         <include layout="@layout/player_tabs"
                  android:visibility="visible"
                  android:layout_height="match_parent"
