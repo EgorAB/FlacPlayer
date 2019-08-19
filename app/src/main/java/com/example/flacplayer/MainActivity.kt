@@ -10,14 +10,14 @@ import android.support.design.widget.TabLayout
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
+import android.support.v4.widget.ContentLoadingProgressBar
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.bottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.playlistItemSelectedBar
-import kotlinx.android.synthetic.main.activity_main_modificated.*
 import kotlinx.android.synthetic.main.bottom_sheet.*
 import kotlinx.android.synthetic.main.player_tabs.*
 
@@ -32,7 +32,20 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
     private val playlistFragment: PlaylistFragment = PlaylistFragment()
     private val playSceneFragment: PlaySceneFragment = PlaySceneFragment()
 
+    // публичные вьюшки чтобы их могли юзать фрагменты
+    public var publicPlayPauseBottomSheet: ImageButton? = null
+    public var publicSongArtistBottomSheet: TextView? = null
+    public var publicSongTitleBottomSheet: TextView? = null
+    public var publicProgbarBottomSheet: ContentLoadingProgressBar? = null
 
+    public fun initValues() {
+        publicPlayPauseBottomSheet = playPauseBottomSheet
+        publicSongArtistBottomSheet = songArtistBottomSheet
+        publicSongTitleBottomSheet = songTitleBottomSheet
+        publicProgbarBottomSheet = progbarBottomSheet
+    }
+
+    // нормальный код
     var songList = arrayListOf<Song>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +53,7 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_modificated)
 
+        initValues()
         window.attributes.layoutInDisplayCutoutMode =
             WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
 
@@ -57,23 +71,17 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
         }
         // tabsBar
         leftTab.setOnClickListener {
-            if(tabLayout.selectedTabPosition > 0)
+            if (tabLayout.selectedTabPosition > 0)
                 viewPager.setCurrentItem(tabLayout.selectedTabPosition - 1, true)
         }
         rightTab.setOnClickListener {
-            if(tabLayout.selectedTabPosition < 2)
+            if (tabLayout.selectedTabPosition < 2)
                 viewPager.setCurrentItem(tabLayout.selectedTabPosition + 1, true)
         }
         //
         playPauseBottomSheet.setOnClickListener {
-            if(playing()) {
-                pause()
-                playPauseBottomSheet.setImageResource(R.drawable.ic_play_arrow_black_24dp)
-            }
-            else {
-                play()
-                playPauseBottomSheet.setImageResource(R.drawable.ic_pause_black_24dp)
-            }
+            if (playing()) pause()
+            else play()
         }
 
         // работа с TabLayout

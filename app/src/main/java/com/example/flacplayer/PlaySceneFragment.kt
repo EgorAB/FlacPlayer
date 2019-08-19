@@ -20,7 +20,7 @@ import java.lang.ClassCastException
 
 class PlaySceneFragment : Fragment() {
 
-    interface PlaySceneInteractionListener{
+    interface PlaySceneInteractionListener {
         fun nextSong(select: Boolean = false): Song?
         fun prevSong(select: Boolean = false): Song
     }
@@ -57,9 +57,9 @@ class PlaySceneFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        try{
+        try {
             mListener = context as PlaySceneInteractionListener
-        } catch (e: ClassCastException){
+        } catch (e: ClassCastException) {
             throw ClassCastException(context.toString() + " должен реализовывать интерфейс PlaySceneInteractionListener")
         }
     }
@@ -69,6 +69,8 @@ class PlaySceneFragment : Fragment() {
             mediaPlayer!!.start()
             startPlayProgressUpdater()
             playButton!!.setImageResource(R.drawable.ic_pause_black_24dp)
+            if (activity != null)
+                (activity as MainActivity).publicPlayPauseBottomSheet?.setImageResource(R.drawable.ic_pause_black_24dp)
         } catch (e: IllegalStateException) {
             mediaPlayer!!.pause()
         }
@@ -77,6 +79,8 @@ class PlaySceneFragment : Fragment() {
     public fun pause() {
         mediaPlayer?.pause()
         playButton?.setImageResource(R.drawable.ic_play_arrow_black_24dp)
+        if (activity != null)
+            (activity as MainActivity).publicPlayPauseBottomSheet?.setImageResource(R.drawable.ic_play_arrow_black_24dp)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,29 +110,26 @@ class PlaySceneFragment : Fragment() {
         previousButton?.setOnClickListener {
             if (seekBar!!.progress > 5000) {
                 mediaPlayer!!.seekTo(0)
-                view.findViewById<SeekBar>(R.id.seekBar).progress = 0
+                seekBar!!.progress = 0
             } else {
-                // currentSongListIndex--
-                // initializePlayer(songList[currentSongListIndex].id)
                 initializePlayer(mListener!!.prevSong(true))
                 play()
             }
         }
         nextButton?.setOnClickListener {
-            // currentSongListIndex++
-            // initializePlayer(songList[currentSongListIndex].id)
             val s: Song? = mListener?.nextSong(true)
-            if(s != null){
+            if (s != null) {
                 initializePlayer(s); play()
-            }
-            else pause()
+            } else pause()
         }
         repeatButton?.setOnClickListener {
             isRepeating = !isRepeating
         }
         seekBar!!.max = mediaPlayer!!.duration
+        if (activity != null)
+            (activity as MainActivity).publicProgbarBottomSheet?.max = mediaPlayer?.duration!!
         seekBar!!.setOnTouchListener { _, _ ->
-            mediaPlayer!!.seekTo(view.findViewById<SeekBar>(R.id.seekBar).progress)
+            mediaPlayer!!.seekTo(seekBar!!.progress)
             updateTimeCounters()
             false
         }
@@ -141,6 +142,8 @@ class PlaySceneFragment : Fragment() {
             @SuppressLint("SetTextI18n")
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 updateTimeCounters()
+                if(activity != null)
+                    (activity as MainActivity).publicProgbarBottomSheet?.progress = progress
             }
         })
         return view
@@ -161,7 +164,7 @@ class PlaySceneFragment : Fragment() {
     }
 
     public fun initializePlayer(songId: Long) {
-        if(context == null) return
+        if (context == null) return
         if (mediaPlayer != null) {
             pause()
             mediaPlayer!!.reset()
@@ -171,15 +174,18 @@ class PlaySceneFragment : Fragment() {
         seekBar!!.progress = 0
         mediaPlayer!!.seekTo(0)
         seekBar!!.max = mediaPlayer?.duration!!
+        if (activity != null)
+            (activity as MainActivity).publicProgbarBottomSheet?.max = mediaPlayer?.duration!!
         updateTimeCounters()
         songArtist?.text = songList[currentSongListIndex].artist
         songTitle?.text = songList[currentSongListIndex].title
-
-//        songArtistBottomSheet!!.text = songList[currentSongListIndex].artist
-//        songTitleBottomSheet!!.text = songList[currentSongListIndex].title
+        if (activity != null)
+            (activity as MainActivity).publicSongArtistBottomSheet?.text = songList[currentSongListIndex].artist
+        if (activity != null)
+            (activity as MainActivity).publicSongTitleBottomSheet?.text = songList[currentSongListIndex].title
 
         mediaPlayer!!.setOnCompletionListener {
-            if(!isRepeating) {
+            if (!isRepeating) {
                 currentSongListIndex++
                 initializePlayer(songList[currentSongListIndex].id)
                 play()
@@ -197,25 +203,31 @@ class PlaySceneFragment : Fragment() {
         seekBar!!.progress = 0
         mediaPlayer!!.seekTo(0)
         seekBar!!.max = mediaPlayer?.duration!!
+        if(activity != null)
+            (activity as MainActivity).publicProgbarBottomSheet?.max = mediaPlayer?.duration!!
         updateTimeCounters()
         songArtist?.text = song.artist
         songTitle?.text = song.title
+        if (activity != null)
+            (activity as MainActivity).publicSongArtistBottomSheet?.text = song.artist
+        if (activity != null)
+            (activity as MainActivity).publicSongTitleBottomSheet?.text = song.title
 //        songArtistBottomSheet!!.text = song.artist
 //        songTitleBottomSheet!!.text = song.title
 
         setOptimalTextSize(song.artist, song.title)
         mediaPlayer!!.setOnCompletionListener {
-            if(!isRepeating) {
+            if (!isRepeating) {
                 val s: Song? = mListener?.nextSong(true)
-                if(s != null){
+                if (s != null) {
                     initializePlayer(s); play()
-                }
-                else pause()
+                } else pause()
             }
         }
     }
-    private fun setOptimalTextSize(artist:String, title:String){
-        when(title.length){
+
+    private fun setOptimalTextSize(artist: String, title: String) {
+        when (title.length) {
             in 0..22 -> {
                 songArtist?.textSize = 22F
                 songTitle?.textSize = 36F
@@ -230,9 +242,14 @@ class PlaySceneFragment : Fragment() {
             }
         }
     }
+
     private fun startPlayProgressUpdater() {
-        if(!clickedOnSeekBar) seekBar!!.progress = mediaPlayer!!.currentPosition
-        else { mediaPlayer!!.seekTo(seekBar!!.progress); clickedOnSeekBar = false }
+        if (!clickedOnSeekBar) {
+            seekBar!!.progress = mediaPlayer!!.currentPosition
+        }
+        else {
+            mediaPlayer!!.seekTo(seekBar!!.progress); clickedOnSeekBar = false
+        }
         if (mediaPlayer!!.isPlaying) {
             val notification = Runnable { startPlayProgressUpdater() }
             handler.postDelayed(notification, 100)
@@ -241,8 +258,9 @@ class PlaySceneFragment : Fragment() {
             mediaPlayer!!.pause()
         }
     }
+
     @SuppressLint("SetTextI18n")
-    private fun updateTimeCounters(){
+    private fun updateTimeCounters() {
         timeCurrent?.text = "${seekBar!!.progress / 1000 / 60}:" +
                 (if (seekBar!!.progress / 1000 % 60 / 10 == 0) "0" else "") +
                 "${seekBar!!.progress / 1000 % 60}"
@@ -250,6 +268,7 @@ class PlaySceneFragment : Fragment() {
                 (if ((seekBar!!.max - seekBar!!.progress) / 1000 % 60 / 10 == 0) "0" else "") +
                 "${(seekBar!!.max - seekBar!!.progress) / 1000 % 60}"
     }
+
     override fun onDestroy() {
         super.onDestroy()
         pause()
