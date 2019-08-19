@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
+import kotlinx.android.synthetic.main.bottom_sheet.*
 import java.lang.ClassCastException
 
 
@@ -160,6 +161,7 @@ class PlaySceneFragment : Fragment() {
     }
 
     public fun initializePlayer(songId: Long) {
+        if(context == null) return
         if (mediaPlayer != null) {
             pause()
             mediaPlayer!!.reset()
@@ -172,6 +174,10 @@ class PlaySceneFragment : Fragment() {
         updateTimeCounters()
         songArtist?.text = songList[currentSongListIndex].artist
         songTitle?.text = songList[currentSongListIndex].title
+
+//        songArtistBottomSheet!!.text = songList[currentSongListIndex].artist
+//        songTitleBottomSheet!!.text = songList[currentSongListIndex].title
+
         mediaPlayer!!.setOnCompletionListener {
             if(!isRepeating) {
                 currentSongListIndex++
@@ -194,6 +200,9 @@ class PlaySceneFragment : Fragment() {
         updateTimeCounters()
         songArtist?.text = song.artist
         songTitle?.text = song.title
+//        songArtistBottomSheet!!.text = song.artist
+//        songTitleBottomSheet!!.text = song.title
+
         setOptimalTextSize(song.artist, song.title)
         mediaPlayer!!.setOnCompletionListener {
             if(!isRepeating) {

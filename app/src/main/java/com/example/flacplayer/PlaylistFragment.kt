@@ -164,13 +164,13 @@ class PlaylistFragment : Fragment() {
                         selectedItems.remove(v)
                         if (songFromView(v).coverUri == null)
                             v.findViewWithTag<ImageView>("cover")
-                                .setImageDrawable(resources.getDrawable(R.mipmap.ic_corgi_icon_final))
+                                .setImageResource(R.mipmap.ic_corgi_icon_final)
                         else v.findViewWithTag<ImageView>("cover").setImageURI(Uri.parse(songFromView(v).coverUri))
                         if (selectedItems.size == 0) (activity as MainActivity).hidePISBar()
                     } else {
                         selectedItems.add(v)
                         v.findViewWithTag<ImageView>("cover")
-                            .setImageDrawable(resources.getDrawable(R.drawable.ic_done_black_24dp))
+                            .setImageResource(R.drawable.ic_done_black_24dp)
                     }
                 }
             }
@@ -178,18 +178,18 @@ class PlaylistFragment : Fragment() {
             v.setOnLongClickListener {
                 (activity as MainActivity).showPISBar()
                 v.findViewWithTag<ImageView>("cover")
-                    .setImageDrawable(resources.getDrawable(R.drawable.ic_done_black_24dp))
+                    .setImageResource(R.drawable.ic_done_black_24dp)
                 if (v in selectedItems) {
                     selectedItems.remove(v)
                     if (songFromView(v).coverUri == null)
                         v.findViewWithTag<ImageView>("cover")
-                            .setImageDrawable(resources.getDrawable(R.mipmap.ic_corgi_icon_final))
+                            .setImageResource(R.mipmap.ic_corgi_icon_final)
                     else v.findViewWithTag<ImageView>("cover").setImageURI(Uri.parse(songFromView(v).coverUri))
                     if (selectedItems.size == 0) (activity as MainActivity).hidePISBar()
                 } else {
                     selectedItems.add(v)
                     v.findViewWithTag<ImageView>("cover")
-                        .setImageDrawable(resources.getDrawable(R.drawable.ic_done_black_24dp))
+                        .setImageResource(R.drawable.ic_done_black_24dp)
                 }
                 true
             }
@@ -200,11 +200,11 @@ class PlaylistFragment : Fragment() {
         for (v in selectedItems) {
             if (songFromView(v).coverUri == null)
                 v.findViewWithTag<ImageView>("cover")
-                    .setImageDrawable(resources.getDrawable(R.mipmap.ic_corgi_icon_final))
+                    .setImageResource(R.mipmap.ic_corgi_icon_final)
             else v.findViewWithTag<ImageView>("cover").setImageURI(Uri.parse(songFromView(v).coverUri))
         }
         selectedItems.clear()
-        (activity as MainActivity).hidePISBar()
+        if(activity != null) (activity as MainActivity).hidePISBar()
     }
 
     public fun PISBarDeleteButton() {
@@ -214,7 +214,7 @@ class PlaylistFragment : Fragment() {
             playlist?.removeView(v)
         }
         selectedItems.clear()
-        (activity as MainActivity).hidePISBar()
+        if(activity != null) (activity as MainActivity).hidePISBar()
     }
 
     // обновление плейлиста

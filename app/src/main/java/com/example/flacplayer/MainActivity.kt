@@ -45,6 +45,9 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
 
         getSongList()
         selectedScene = player_tabs
+
+        // работа с Bar-ами
+        // playlistItemSelectedBar
         playlistItemSelectedBar.alpha = 0f
         playlistItemSelectedBar.findViewWithTag<ImageButton>("delete").setOnClickListener {
             playlistFragment.PISBarDeleteButton()
@@ -52,63 +55,78 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
         playlistItemSelectedBar.findViewWithTag<ImageButton>("close").setOnClickListener {
             playlistFragment.PISBarCloseButton()
         }
+        // tabsBar
+        leftTab.setOnClickListener {
+            if(tabLayout.selectedTabPosition > 0)
+                viewPager.setCurrentItem(tabLayout.selectedTabPosition - 1, true)
+        }
+        rightTab.setOnClickListener {
+            if(tabLayout.selectedTabPosition < 2)
+                viewPager.setCurrentItem(tabLayout.selectedTabPosition + 1, true)
+        }
+        //
+        playPauseBottomSheet.setOnClickListener {
+            if(playing()) {
+                pause()
+                playPauseBottomSheet.setImageResource(R.drawable.ic_play_arrow_black_24dp)
+            }
+            else {
+                play()
+                playPauseBottomSheet.setImageResource(R.drawable.ic_pause_black_24dp)
+            }
+        }
+
+        // работа с TabLayout
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             // val appBars = arrayListOf<View>(libraryBar, playBar, playlistBar)
             override fun onTabSelected(tab: TabLayout.Tab) {
                 if (tab.position == 2 || tab.position == 0) {
                     hideBottomNavigationView()
-                    // showPISBar()
+                }
+                when (tab.position) {
+                    0 -> {
+                        leftTab.visibility = View.GONE
+                        rightTab.visibility = View.VISIBLE
+                        tabId.text = "Библиотека"
+                    }
+                    1 -> {
+                        leftTab.visibility = View.VISIBLE
+                        rightTab.visibility = View.VISIBLE
+                        tabId.text = "Трек"
+                    }
+                    2 -> {
+                        leftTab.visibility = View.VISIBLE
+                        rightTab.visibility = View.GONE
+                        tabId.text = "Плейлист"
+                    }
                 }
 
                 if (tab.position == 2) playlistFragment.selectSong(playlistFragment.currentSongView)
-
-                // appBars[tab.position].alpha = 1F
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {
                 if (tab.position == 2 || tab.position == 0) {
                     showBottomNavigationView()
-                    // hidePISBar()
                 }
                 if (tab.position == 2) playlistFragment.PISBarCloseButton()
-                // appBars[tab.position].alpha = 0F
             }
 
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
-//        bottomNavigationView.selectedItemId = R.id.playButton
-//        bottomNavigationView.setOnNavigationItemSelectedListener {
-//            when (it.itemId) {
-//                R.id.homeButton -> {
-//                    selectScene(home_layout)
-//                    true
-//                }
-//                R.id.playButton -> {
-//                    selectScene(player_tabs)
-//                    true
-//                }
-//                R.id.moreButton -> {
-//                    selectScene(more_layout)
-//                    true
-//                }
-//                else -> true
-//            }
-//        }
-
         setupViewPager(viewPager)
         tabLayout.setupWithViewPager(viewPager)
-//        moreListView.adapter = ArrayAdapter(
-//            this, android.R.layout.simple_list_item_1,
-//            arrayOf(
-//                "Настройки",
-//                "О приложении"
-//            )
-//        )
 
+        // работа с BottomSheet
         val bottomSheetBehavior: BottomSheetBehavior<LinearLayout> = BottomSheetBehavior.from(bottom_sheet)
         bottomSheetBehavior.isHideable = false
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) { }
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    tabsBar.visibility = View.GONE
+                    playlistFragment.PISBarCloseButton()
+                } else tabsBar.visibility = View.VISIBLE
+            }
+
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 tabsBar.alpha = slideOffset
             }
@@ -193,12 +211,15 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
     // hide playlistItemSelectedBar
     fun hidePISBar() {
         playlistItemSelectedBar.clearAnimation()
-        playlistItemSelectedBar.animate().alpha(0f).duration = 200
+        playlistItemSelectedBar.animate().alpha(0f).withEndAction {
+            playlistItemSelectedBar.visibility = View.GONE
+        }.duration = 200
     }
 
     // show playlistItemSelectedBar
     fun showPISBar() {
         playlistItemSelectedBar.clearAnimation()
+        playlistItemSelectedBar.visibility = View.VISIBLE
         playlistItemSelectedBar.animate().alpha(1f).duration = 200
     }
 }
