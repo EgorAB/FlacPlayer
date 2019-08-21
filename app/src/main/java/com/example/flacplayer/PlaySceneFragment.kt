@@ -16,6 +16,11 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import kotlinx.android.synthetic.main.bottom_sheet.*
 import java.lang.ClassCastException
+import android.media.MediaMetadataRetriever
+import kotlinx.android.synthetic.main.play_scene.*
+import android.R.attr.data
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 
 
 class PlaySceneFragment : Fragment() {
@@ -25,6 +30,7 @@ class PlaySceneFragment : Fragment() {
         fun prevSong(select: Boolean = false): Song
     }
 
+    var playing = false
     var mListener: PlaySceneInteractionListener? = null
     var songList: ArrayList<Song> = arrayListOf()
     private var currentSongListIndex: Int = 0
@@ -65,6 +71,7 @@ class PlaySceneFragment : Fragment() {
     }
 
     public fun play() {
+        if(mediaPlayer == null) return
         try {
             mediaPlayer!!.start()
             startPlayProgressUpdater()
@@ -89,19 +96,32 @@ class PlaySceneFragment : Fragment() {
     }
 
     @SuppressLint("ClickableViewAccessibility", "NewApi")
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // можно проводить все требуемые манипуляции
         // создаем view-элемент из разметки и проводим с ним манипуляции, после чего возвращаем из метода
         val view = inflater.inflate(R.layout.play_scene, container, false)
         // songList initialization
         songList = arrayListOf(
             Song(R.raw.farzam_finding_hope.toLong(), "FARZAM", "Finding Hope"),
-            Song(R.raw.asking_alexandria_alone_in_a_room.toLong(), "Asking Alexandria", "Alone in a room"),
+            Song(
+                R.raw.asking_alexandria_alone_in_a_room.toLong(),
+                "Asking Alexandria",
+                "Alone in a room"
+            ),
             Song(R.raw.dez_money_wings.toLong(), "Dez Money", "Wings")
         )
 
         initializeValues(view)
         initializePlayer(songList[currentSongListIndex].id)
+
+        if(view.findViewById<ImageView>(R.id.Gradient) != null) {
+            val gradient = view.findViewById<ImageView>(R.id.Gradient)
+            gradient.scaleY = gradient.scaleX
+        }
 
         playButton?.setOnClickListener {
             if (mediaPlayer!!.isPlaying) pause()
@@ -135,14 +155,21 @@ class PlaySceneFragment : Fragment() {
         }
         seekBar!!.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                if (playing) mediaPlayer?.start()
+                playing = false
+                mediaPlayer!!.seekTo(seekBar!!.progress); clickedOnSeekBar = false
+            }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) { clickedOnSeekBar = true }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                clickedOnSeekBar = true
+                playing = mediaPlayer!!.isPlaying
+            }
 
             @SuppressLint("SetTextI18n")
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 updateTimeCounters()
-                if(activity != null)
+                if (activity != null)
                     (activity as MainActivity).publicProgbarBottomSheet?.progress = progress
             }
         })
@@ -180,9 +207,11 @@ class PlaySceneFragment : Fragment() {
         songArtist?.text = songList[currentSongListIndex].artist
         songTitle?.text = songList[currentSongListIndex].title
         if (activity != null)
-            (activity as MainActivity).publicSongArtistBottomSheet?.text = songList[currentSongListIndex].artist
+            (activity as MainActivity).publicSongArtistBottomSheet?.text =
+                songList[currentSongListIndex].artist
         if (activity != null)
-            (activity as MainActivity).publicSongTitleBottomSheet?.text = songList[currentSongListIndex].title
+            (activity as MainActivity).publicSongTitleBottomSheet?.text =
+                songList[currentSongListIndex].title
 
         mediaPlayer!!.setOnCompletionListener {
             if (!isRepeating) {
@@ -198,12 +227,13 @@ class PlaySceneFragment : Fragment() {
             pause()
             mediaPlayer!!.reset()
         }
+        if(context == null) return
         mediaPlayer = MediaPlayer.create(this.context!!, song.uri)
 
         seekBar!!.progress = 0
         mediaPlayer!!.seekTo(0)
         seekBar!!.max = mediaPlayer?.duration!!
-        if(activity != null)
+        if (activity != null)
             (activity as MainActivity).publicProgbarBottomSheet?.max = mediaPlayer?.duration!!
         updateTimeCounters()
         songArtist?.text = song.artist
@@ -212,10 +242,18 @@ class PlaySceneFragment : Fragment() {
             (activity as MainActivity).publicSongArtistBottomSheet?.text = song.artist
         if (activity != null)
             (activity as MainActivity).publicSongTitleBottomSheet?.text = song.title
-//        songArtistBottomSheet!!.text = song.artist
-//        songTitleBottomSheet!!.text = song.title
 
         setOptimalTextSize(song.artist, song.title)
+
+        val mmr = MediaMetadataRetriever()
+        mmr.setDataSource(song.uri!!.path)
+        val data = mmr.embeddedPicture
+
+        if (data != null) {
+            val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+            if(bitmap != null) Gradient.setImageBitmap(bitmap)
+            else Gradient.setImageResource(R.mipmap.ic_corgi_icon_final)
+        }
         mediaPlayer!!.setOnCompletionListener {
             if (!isRepeating) {
                 val s: Song? = mListener?.nextSong(true)
@@ -237,7 +275,7 @@ class PlaySceneFragment : Fragment() {
                 songTitle?.textSize = 30F
             }
             else -> {
-                songArtist?.textSize = 18F
+                songArtist?.textSize = 20F
                 songTitle?.textSize = 24F
             }
         }
@@ -246,9 +284,8 @@ class PlaySceneFragment : Fragment() {
     private fun startPlayProgressUpdater() {
         if (!clickedOnSeekBar) {
             seekBar!!.progress = mediaPlayer!!.currentPosition
-        }
-        else {
-            mediaPlayer!!.seekTo(seekBar!!.progress); clickedOnSeekBar = false
+        } else {
+
         }
         if (mediaPlayer!!.isPlaying) {
             val notification = Runnable { startPlayProgressUpdater() }

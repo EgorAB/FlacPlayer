@@ -2,6 +2,9 @@ package com.example.flacplayer
 
 import android.content.ContentResolver
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -19,6 +22,7 @@ import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.playlistItemSelectedBar
 import kotlinx.android.synthetic.main.bottom_sheet.*
+import kotlinx.android.synthetic.main.play_scene.*
 import kotlinx.android.synthetic.main.player_tabs.*
 
 
@@ -191,15 +195,19 @@ class MainActivity : FragmentActivity(), PlaylistFragment.PlaylistInteractionLis
             val titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
             val idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID)
             val artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
-            val coverColumn: Int = musicCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART)
             //add songs to list
             do {
                 val thisId = musicCursor.getLong(idColumn)
                 val thisTitle = musicCursor.getString(titleColumn)
                 val thisArtist = musicCursor.getString(artistColumn)
-                // val thisCoverUri = musicCursor.getString(coverColumn)
                 val thisData = musicCursor.getString(data)
-                songList.add(Song(thisId, thisArtist, thisTitle, Uri.parse("file:///$thisData")))
+                // достаем картиночку
+                val mmr = MediaMetadataRetriever()
+                mmr.setDataSource(Uri.parse("file:///$thisData")!!.path)
+                val pic = mmr.embeddedPicture
+                var bitmap:Bitmap? = null
+                if(pic != null) bitmap = BitmapFactory.decodeByteArray(pic, 0, pic.size)
+                songList.add(Song(thisId, thisArtist, thisTitle, Uri.parse("file:///$thisData"), bitmap))
             } while (musicCursor.moveToNext())
         }
         musicCursor?.close()

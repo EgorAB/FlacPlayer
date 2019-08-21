@@ -2,13 +2,11 @@ package com.example.flacplayer
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.Uri
 import android.support.constraint.ConstraintLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.ImageView
 import android.widget.TextView
 
 class SongAdapter(c: Context, theSongs: ArrayList<Song>) : BaseAdapter() {
@@ -24,11 +22,9 @@ class SongAdapter(c: Context, theSongs: ArrayList<Song>) : BaseAdapter() {
         val songLay: ConstraintLayout = songInflater?.inflate(R.layout.song, parent, false) as ConstraintLayout
         val songView: TextView = songLay.findViewById(R.id.song_title)
         val artistView: TextView = songLay.findViewById(R.id.song_artist)
-        val songCover: ImageView = songLay.findViewById(R.id.song_cover)
         val currSong: Song = songs[position]
         songView.text =  currSong.title
         artistView.text = currSong.artist
-        if(currSong.coverUri != null) songCover.setImageURI(Uri.parse(currSong.coverUri))
         songLay.tag = position
         return songLay
     }

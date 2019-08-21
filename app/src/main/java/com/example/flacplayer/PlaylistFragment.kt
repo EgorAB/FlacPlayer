@@ -1,6 +1,7 @@
 package com.example.flacplayer
 
 import android.content.Context
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -8,11 +9,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import kotlinx.android.synthetic.main.activity_main.*
+
 
 class PlaylistFragment : Fragment() {
 
@@ -37,7 +37,11 @@ class PlaylistFragment : Fragment() {
 
     val selectedItems: ArrayList<View> = arrayListOf()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         if (playlistView == null) {
             playlistView = inflater.inflate(R.layout.playlist, container, false)
             playlist = playlistView?.findViewById(R.id.playlist)
@@ -73,15 +77,19 @@ class PlaylistFragment : Fragment() {
 
     private fun deselectSong(songV: View?) {
         if (songV == null) return
-        songV.findViewWithTag<TextView>("artist").setTextColor(resources.getColor(R.color.materialLightGray))
-        songV.findViewWithTag<TextView>("title").setTextColor(resources.getColor(R.color.materialDarkGray))
+        songV.findViewWithTag<TextView>("artist")
+            .setTextColor(resources.getColor(R.color.materialLightGray))
+        songV.findViewWithTag<TextView>("title")
+            .setTextColor(resources.getColor(R.color.materialDarkGray))
     }
 
     public fun selectSong(songV: View?) {
         if (songV == null) return
         deselectSong(currentSongView)
-        songV.findViewWithTag<TextView>("artist").setTextColor(resources.getColor(R.color.darkThemeColorPrimary))
-        songV.findViewWithTag<TextView>("title").setTextColor(resources.getColor(R.color.darkThemeColorPrimaryDark))
+        songV.findViewWithTag<TextView>("artist")
+            .setTextColor(resources.getColor(R.color.darkThemeColorPrimary))
+        songV.findViewWithTag<TextView>("title")
+            .setTextColor(resources.getColor(R.color.darkThemeColorPrimaryDark))
         currentSongView = songV
     }
 
@@ -144,7 +152,8 @@ class PlaylistFragment : Fragment() {
             songViews.add(v)
             v.findViewWithTag<TextView>("title").text = it.title
             v.findViewWithTag<TextView>("artist").text = it.artist
-            if (it.coverUri != null) v.findViewWithTag<ImageView>("cover").setImageURI(Uri.parse(it.coverUri))
+            v.findViewWithTag<TextView>("time").text = timeStringFromUri(it.uri)
+            if (it.cover != null) v.findViewWithTag<ImageView>("cover").setImageBitmap(it.cover)
             v.setOnClickListener {
                 if (selectedItems.size == 0) {
                     val s = songFromView(v)
@@ -162,10 +171,10 @@ class PlaylistFragment : Fragment() {
                 } else {
                     if (v in selectedItems) {
                         selectedItems.remove(v)
-                        if (songFromView(v).coverUri == null)
+                        if (songFromView(v).cover == null)
                             v.findViewWithTag<ImageView>("cover")
                                 .setImageResource(R.mipmap.ic_corgi_icon_final)
-                        else v.findViewWithTag<ImageView>("cover").setImageURI(Uri.parse(songFromView(v).coverUri))
+                        else v.findViewWithTag<ImageView>("cover").setImageBitmap(songFromView(v).cover)
                         if (selectedItems.size == 0) (activity as MainActivity).hidePISBar()
                     } else {
                         selectedItems.add(v)
@@ -181,10 +190,10 @@ class PlaylistFragment : Fragment() {
                     .setImageResource(R.drawable.ic_done_black_24dp)
                 if (v in selectedItems) {
                     selectedItems.remove(v)
-                    if (songFromView(v).coverUri == null)
+                    if (songFromView(v).cover == null)
                         v.findViewWithTag<ImageView>("cover")
                             .setImageResource(R.mipmap.ic_corgi_icon_final)
-                    else v.findViewWithTag<ImageView>("cover").setImageURI(Uri.parse(songFromView(v).coverUri))
+                    else v.findViewWithTag<ImageView>("cover").setImageBitmap(songFromView(v).cover)
                     if (selectedItems.size == 0) (activity as MainActivity).hidePISBar()
                 } else {
                     selectedItems.add(v)
@@ -196,15 +205,24 @@ class PlaylistFragment : Fragment() {
         }
     }
 
+    fun timeStringFromUri(uri: Uri?): String {
+        if (context == null || uri == null) return ""
+        val mediaPlayer: MediaPlayer = MediaPlayer.create(this.context, uri)
+        val min = mediaPlayer.duration / 1000 / 60
+        val intSec = mediaPlayer.duration / 1000 % 60
+        val sec = "${if (intSec < 10) "0" else ""}${intSec % 60}"
+        return "$min:$sec"
+    }
+
     public fun PISBarCloseButton() {
         for (v in selectedItems) {
-            if (songFromView(v).coverUri == null)
+            if (songFromView(v).cover == null)
                 v.findViewWithTag<ImageView>("cover")
                     .setImageResource(R.mipmap.ic_corgi_icon_final)
-            else v.findViewWithTag<ImageView>("cover").setImageURI(Uri.parse(songFromView(v).coverUri))
+            else v.findViewWithTag<ImageView>("cover").setImageBitmap(songFromView(v).cover)
         }
         selectedItems.clear()
-        if(activity != null) (activity as MainActivity).hidePISBar()
+        if (activity != null) (activity as MainActivity).hidePISBar()
     }
 
     public fun PISBarDeleteButton() {
@@ -214,7 +232,7 @@ class PlaylistFragment : Fragment() {
             playlist?.removeView(v)
         }
         selectedItems.clear()
-        if(activity != null) (activity as MainActivity).hidePISBar()
+        if (activity != null) (activity as MainActivity).hidePISBar()
     }
 
     // обновление плейлиста
